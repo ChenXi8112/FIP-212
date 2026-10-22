@@ -107,7 +107,7 @@ def pascal_iter(n):
 
 **备注**：`pascal.py` 里是单次调用计时，包含解释器冷启动；表中是多次重复测量的平均值，所以数值更小，两者不要直接比较。
 ### 5.2 解释
-在计算第 n+1 行时，`pascal` 函数只会计算一次第 n 行，但`pascal_bad`函数足足会计算 2n 次第 n 行。所以 `pascal` 函数的算法复杂度为 $O(n^2)$（共调用 n+1 次；第 k 层有一个 k-1 次的循环），而 `pascal_bad`函数则为  $O(2^n*n!)$（每层直接调用上一行 2(n-1) 次）。因此，`pascal` 函数的耗时远远低于 `pascal_bad`函数。
+在计算第 n+1 行时，`pascal` 函数只会计算一次第 n 行，但 `pascal_bad` 函数足足会计算 2n 次第 n 行。所以 `pascal` 函数的算法复杂度为 $O(n^2)$（共调用 n+1 次；第 k 层有一个 k-1 次的循环），而 `pascal_bad` 函数则为  $O(2^n*n!)$（每层直接调用上一行 2(n-1) 次）。因此，`pascal` 函数的耗时远远低于 `pascal_bad` 函数。
 
 ## 6. AI 使用说明
 - 使用工具：DeepSeek Harness（模型Deepseek V4.1 Flash），引用 `@pascal.py` 和 `@README.md`；
