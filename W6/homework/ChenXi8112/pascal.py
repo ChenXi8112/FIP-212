@@ -1,3 +1,5 @@
+"""2组作业"""
+
 from time import time
 # count = 0
 
