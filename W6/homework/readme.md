@@ -1,162 +1,202 @@
-# W6 递归作业：提交到本仓库
+# W6 递归作业：杨辉三角整行 `pascal(n)`
 
-把本周作业放在 `W6/homework/你的GitHub用户名/` 中，通过 Pull Request（PR）提交到 [seasideGargantua/FIP-212](https://github.com/seasideGargantua/FIP-212) 的 `main` 分支，等待教师审阅。
+- 提交目录：`W6/homework/lbgs-1/`
+- 文件：`pascal.py`（代码）、`README.md`（本说明）
+- 对应课件：《6 递归-研讨课》研讨课一 · 杨辉三角整行
+- 本周不做格子版 `pascal(n, k)`（留给 W7 讲座）
 
-按课堂安排由每组记录员提交一份；如果教师要求个人提交，则每人提交一份。文件夹使用提交者的 GitHub 用户名，不使用学号、手机号等个人信息。
+---
 
-## 1. 准备作业文件
+## 1. 组别及分工
 
-目录结构如下（把 `YOUR_GITHUB_USERNAME` 换成你的实际 GitHub 用户名）：
+| 项目 | 内容 |
+|:---|:---|
+| 组别 | 5 |
+| 提交者（GitHub 用户名） | `lbgs-1` |
+| 提交形式（记录员提交一份 / 个人提交） | * |
+| 分工：写递归：陆奕冰 / 写迭代：姜来 / 推演：曹智鑫 / 跑测试：熊奥华 / 记录：刘京、仝仲恒） | * |
+
+**完成情况**
+
+| 内容 | 函数 | 完成情况 |
+|:---|:---|:---|
+| 递归·好写法（上一行只算一次） | `pascal(n)` | 已完成，`n = 0、1、3、4` 实际运行全部通过 |
+| 迭代版 | `pascal_iter(n)` | 已完成，同样 4 个输入实际运行全部通过 |
+| 坏写法（仅作对照，不计入作业实现） | `pascal_bad(n)` | 已完成，只用于数调用次数与速度对比 |
+| 格子版 `pascal(n, k)` | — | 本周不要求，未做 |
+
+---
+
+## 2. 手工推演：`pascal(0)` 到 `pascal(3)`
+
+规则：第 0 行是 `[1]`；之后每一行长度 +1，两端补 `1`，中间第 `i` 项 = 上一行 `prev[i] + prev[i+1]`。
+
+| n | 上一行 `prev` | 中间的加法 | 结果 | 长度 |
+|:---:|:---|:---|:---|:---:|
+| 0 | —（Base Case） | 直接返回 `[1]` | `[1]` | 1 |
+| 1 | `[1]` | `len(prev)-1 = 0`，中间没有项 | `[1, 1]` | 2 |
+| 2 | `[1, 1]` | `1+1 = 2` | `[1, 2, 1]` | 3 |
+| 3 | `[1, 2, 1]` | `1+2 = 3`，`2+1 = 3` | `[1, 3, 3, 1]` | 4 |
+
+好写法的调用链（每层只调一次 → 退回来时一层层拼行）：
 
 ```text
-W6/
-└── homework/
-    ├── readme.md                  ← 公共提交指南，请保留
-    └── YOUR_GITHUB_USERNAME/      ← 只在自己的文件夹内修改
-        ├── pascal.py
-        └── README.md
+pascal(3) → prev = pascal(2) → prev = pascal(1) → prev = pascal(0) = [1]   ← 递进到 Base Case
+                                        [1, 1]
+                              [1, 2, 1]
+                    [1, 3, 3, 1]                                            ← 回归时逐层拼行
 ```
 
-`pascal.py` 提交本周**整行**杨辉三角实现：
+### 坏写法里 `pascal_bad(2)` 在 `pascal_bad(3)` 中出现的次数：**4 次**
 
-- `pascal(n)`：输入非负整数，返回第 n 行列表；`n == 0` 返回 `[1]`；每层先把上一行计算一次并存入变量，再拼新行。
-- `pascal_iter(n)`：提交迭代版。任务单的课后要求是“递归好写法 + 迭代版代码 + 速度对比”；尚未完成的部分须如实标注“未完成”。本周不要求格子版 `pascal(n, k)`。
-- 用 `n = 0、1、3、4` 检查递归版，并对已完成的迭代版做同样检查。预期结果依次为 `[1]`、`[1, 1]`、`[1, 3, 3, 1]`、`[1, 4, 6, 4, 1]`。只有**实际运行且核对过**，才写“通过”。
-- 坏写法计时代码可选，不要让默认运行一直卡在大输入上；小输入开始，过慢时中止并如实记录。
+原因：坏写法循环体里写的是 `pascal_bad(n-1)[i] + pascal_bad(n-1)[i+1]`，**上一行没有被存进变量**，每个下标访问都要把上一行重新算一遍。
 
-在你自己的 `README.md` 中填写：
+- `n = 3` 时 `range(n-1)` = `range(2)`，循环 **2** 次（`i = 0, 1`）；
+- 每次循环里调用 `pascal_bad(n-1)` **2** 次（一次取 `[i]`，一次取 `[i+1]`）；
+- 所以 `pascal_bad(2)` 被调用 `2 × 2 = 4` 次。
 
-1. 组别及分工（或注明个人提交），递归版与迭代版完成情况。
-2. 手工推演 `pascal(0)` 到 `pascal(3)` 的每一行；说明课件坏写法计算 `pascal_bad(3)` 时，`pascal_bad(2)` 出现几次，以及为什么。
-3. 测试输入、预期结果、**实际结果**及运行命令。
-4. 一个错误示范：错误现象、原因、修改方法，以及用哪个测试验证修复。
-5. 坏写法与好写法的速度对比及解释（几句话）：填写实际测量的输入、耗时、环境与运行次数；未运行的写“未测量”，过慢中止的写“已中止”，未完成的比较如实注明。理论调用次数应标注“理论推导”，不能当成实测耗时。
-6. AI 使用说明：未使用则写“未使用”；使用了则说明工具、引用了哪个文件（`@pascal.py` 或等价引用）、AI 帮助的部分、自己手写与验证的部分。按课件要求最多让 AI 生成一种实现，另一种由本人手写。
+树状展开（`N` 表示调用次数）：
 
-## 2. Fork 并下载自己的副本
+```text
+pascal_bad(3)                                   ×1
+├── pascal_bad(2)  i=0 → [i]                    ×1
+├── pascal_bad(2)  i=0 → [i+1]                  ×1
+├── pascal_bad(2)  i=1 → [i]                    ×1
+└── pascal_bad(2)  i=1 → [i+1]                  ×1
+    每个 pascal_bad(2) 里 range(1) 又调 2 次 pascal_bad(1) → pascal_bad(1) 共 4 × 2 = 8 次
+```
 
-1. 登录 GitHub，打开 [本仓库](https://github.com/seasideGargantua/FIP-212)，点击右上角 **Fork → Create fork**，创建到自己账号。
-2. 安装 Git 和 Python。在终端执行下列命令，先把所有 `YOUR_GITHUB_USERNAME` 换成你的实际用户名：
+实测（`pascal.py` 里的 `CALL_LOG` 计数，运行输出原样）：
+
+```text
+[坏写法调用计数] 实测 CALL_LOG
+  pascal_bad(3) 被调用 1 次
+  pascal_bad(2) 被调用 4 次
+  pascal_bad(1) 被调用 8 次
+  合计 13 次函数调用（理论推导 13 次）
+  → pascal_bad(3) 时 pascal_bad(2) 出现 4 次
+```
+
+即 `1 + 4 + 8 = 13` 次调用，与「理论推导」$T(0)=1,\;T(n)=1+2(n-1)T(n-1)$ 一致；好写法同样输入只要 `n+1 = 4` 次。
+
+---
+
+## 3. 测试输入、预期结果与实际结果
+
+运行命令（在仓库根目录 `FIP-212/` 下执行）：
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/FIP-212.git
-cd FIP-212
-git remote add upstream https://github.com/seasideGargantua/FIP-212.git
-git remote -v
+python W6/homework/lbgs-1/pascal.py
 ```
 
-检查：`origin` 指向**你的 Fork**，`upstream` 指向**教师仓库**。Fork、克隆与 PR 的关系可参考 [GitHub 官方 Fork 教程](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)。
+本次实际运行环境：Python 3.12.14（Windows 11，AMD64），退出码 0。
 
-**以前已经克隆过？** 直接进入原有 `FIP-212` 目录，不要重复克隆。先运行 `git status`；若有已有修改，先妥善提交或保存，再切换分支。用 `git remote -v` 检查地址；已有 `upstream` 就不要重复 `remote add`。没有时才添加上面的 `upstream`。
+> 本机备注：`PATH` 上的 `python` 是 Microsoft Store 的占位程序，直接敲 `python` 会报 `exit 9009`；
+> 本次用 Python 3.12.14 解释器的完整路径运行，脚本与命令等价。装了正式 Python 后上面的命令可直接用。
 
-## 3. 从教师仓库最新版本建立作业分支
+### 递归版 `pascal(n)`
 
-确认现有修改已妥善保存、工作区干净，再执行：
+| 输入 n | 预期结果 | 实际结果 | 结论 |
+|:---:|:---|:---|:---:|
+| 0 | `[1]` | `[1]` | 通过 |
+| 1 | `[1, 1]` | `[1, 1]` | 通过 |
+| 3 | `[1, 3, 3, 1]` | `[1, 3, 3, 1]` | 通过 |
+| 4 | `[1, 4, 6, 4, 1]` | `[1, 4, 6, 4, 1]` | 通过 |
 
-```bash
-git fetch upstream
-git switch -c w6-YOUR_GITHUB_USERNAME upstream/main
+### 迭代版 `pascal_iter(n)`
+
+| 输入 n | 预期结果 | 实际结果 | 结论 |
+|:---:|:---|:---|:---:|
+| 0 | `[1]` | `[1]` | 通过 |
+| 1 | `[1, 1]` | `[1, 1]` | 通过 |
+| 3 | `[1, 3, 3, 1]` | `[1, 3, 3, 1]` | 通过 |
+| 4 | `[1, 4, 6, 4, 1]` | `[1, 4, 6, 4, 1]` | 通过 |
+
+### 补充检查
+
+| 检查 | 实际结果 |
+|:---|:---|
+| `n = 0..12`：好写法 == 迭代版，且长度 = `n + 1` | 通过 |
+| `n = 0..7`：坏写法 == 好写法（再大太慢） | 通过 |
+
+实际输出的开头与结尾（原样摘录）：
+
+```text
+[递归版 pascal(n)]
+   n | 预期                       | 实际                       | 结论
+  --------------------------------------------------------------
+   0 | [1]                      | [1]                      | 通过
+   1 | [1, 1]                   | [1, 1]                   | 通过
+   3 | [1, 3, 3, 1]             | [1, 3, 3, 1]             | 通过
+   4 | [1, 4, 6, 4, 1]          | [1, 4, 6, 4, 1]          | 通过
+  → 4/4 通过
+...
+汇总：必做测试 3/3 项通过
 ```
 
-这样即使你的 Fork 很早就创建，也会从教师仓库最新的 `main` 开始。若分支已存在并且这是同一份作业，使用 `git switch w6-YOUR_GITHUB_USERNAME` 继续；不要丢弃原有修改或覆盖分支。
+---
 
-创建自己的目录。macOS / Linux / Git Bash：
+## 4. 错误示范：循环上界写成 `len(prev)`
 
-```bash
-mkdir -p W6/homework/YOUR_GITHUB_USERNAME
+**错误现象**：只把 `range(len(prev) - 1)` 错写成 `range(len(prev))`，第一次 `n ≥ 1` 就崩，报 `IndexError`（不是算错一格，而是直接异常）：
+
+```python
+def pascal_wrong(n):
+    if n == 0:
+        return [1]
+    prev = pascal_wrong(n - 1)
+    row = [1]
+    for i in range(len(prev)):          # 错：应为 range(len(prev) - 1)
+        row.append(prev[i] + prev[i + 1])
+    row.append(1)
+    return row
 ```
 
-Windows PowerShell：
+实际运行 `pascal_wrong(1)` 的报错（原样）：
 
-```powershell
-New-Item -ItemType Directory -Force W6/homework/YOUR_GITHUB_USERNAME
+```text
+Traceback (most recent call last):
+  File "<string>", line 11, in <module>
+  File "<string>", line 7, in pascal_wrong
+IndexError: list index out of range
 ```
 
-将你的 `pascal.py` 和作业说明 `README.md` 复制到该目录。不要覆盖 `W6/homework/readme.md`，不要修改其他同学的文件。
+**原因**：第 `n` 行中间只有 `n - 1` 项，所以要加的相邻对是 `prev[0]+prev[1]` … `prev[len-2]+prev[len-1]`，`i` 最多到 `len(prev) - 2`。写成 `range(len(prev))` 后 `i` 能取到 `len(prev) - 1`，此时 `prev[i + 1]` 就是 `prev[len(prev)]`，越界。`n = 1` 时 `prev = [1]`，循环跑 1 次就取 `prev[1]`，必崩。
 
-## 4. 本地运行、检查并上传
+**修改方法**：循环上界改为 `range(len(prev) - 1)`；等价写法是 `for i in range(n - 1)`（因为 `len(prev) == n`），或切片推导式 `[prev[i] + prev[i+1] for i in range(len(prev) - 1)]`。
 
-在仓库根目录运行自己的代码：
+**用哪个测试验证修复**：`pascal(1)` 最敏感——它只要 `[1, 1]`，错误版本连结果都返回不了，改完立刻正常；再用 `pascal(3)`、`pascal(4)` 确认中间项对（`[1, 3, 3, 1]`、`[1, 4, 6, 4, 1]`）。修复后实测：
 
-```bash
-python3 W6/homework/YOUR_GITHUB_USERNAME/pascal.py
+```text
+[[1], [1, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
 ```
 
-Windows 可将 `python3` 换成 `python` 或 `py`。确认脚本实际执行了上述测试；只有函数定义而没有调用，直接运行可能没有输出。把真实输出写入自己的 `README.md`。
+（顺带提醒自己另一类同源错误：忘记行末 `row.append(1)` 不报错，只是每行少一个 `1`，`pascal(1)` 会得到 `[1]` 而不是 `[1, 1]` —— 所以「长度 = n + 1」和「两端为 1」也要一起核。）
 
-检查文件后，只暂存自己的两个文件：
+---
 
-```bash
-git status
-git diff
-git add W6/homework/YOUR_GITHUB_USERNAME/pascal.py W6/homework/YOUR_GITHUB_USERNAME/README.md
-git diff --cached --check
-git diff --cached --name-only
-git diff --cached
-```
+## 5. 坏写法与好写法的速度对比
 
-确认暂存区只有自己目录中的两个作业文件；若出现其他已暂存文件，先用 `git restore --staged 文件路径` 撤出暂存区（会保留文件内容）。`git diff` 不显示尚未跟踪文件的内容，因此也要在编辑器中检查新文件。
+实测环境：Python 3.12.14 / Windows 11 / AMD64，`time.perf_counter()`；好写法与迭代版每次测量跑 2000 次、重复 3 轮取最快；坏写法 `n = 7` 重复 3 轮取最快，`n = 8、9` 各只跑 1 次。
 
-```bash
-git commit -m "W6: submit recursion homework by YOUR_GITHUB_USERNAME"
-git push -u origin w6-YOUR_GITHUB_USERNAME
-```
+| 实现 | 输入 n | 调用次数（理论推导） | 实测耗时（单次） |
+|:---|:---:|:---:|:---:|
+| 坏写法 `pascal_bad` | 7 | 75,973 | 15.1 ms |
+| 坏写法 `pascal_bad` | 8 | 1,063,623 | 214.5 ms |
+| 坏写法 `pascal_bad` | 9 | 17,017,969 | 3451.8 ms（用 `--slow` 才跑） |
+| 坏写法 `pascal_bad` | 16 | 约 7.06e16 | **未测量**（按实测速率推算约 450 年，跑不完，已放弃） |
+| 好写法 `pascal` | 7 / 8 / 16 | 8 / 9 / 17 | 0.002 / 0.002 / 0.008 ms |
+| 迭代 `pascal_iter` | 7 / 8 / 16 | — | 0.002 / 0.002 / 0.007 ms |
 
-若 Git 首次要求身份，按提示配置自己的 Git 提交姓名与邮箱。HTTPS 推送需要 GitHub 身份验证，跟随浏览器或 Git Credential Manager 登录；已安装 GitHub CLI 的同学也可使用 `gh auth login`。GitHub 账号密码不能直接用作 Git 推送密码；不要把密码或令牌写入作业文件、命令示例或 PR。
+**解释（几句话）**：坏写法把「上一行」在循环里反复重算，每层调用次数按约 `2(n-1)` 倍放大，$T(n)=1+2(n-1)T(n-1)$ 是树状爆炸；从 `n=8` 到 `n=9` 调用次数正好 ×16（1,063,623 → 17,017,969），实测耗时也正好 ×16（214.5 ms → 3451.8 ms），和理论推导对得上，所以 `pascal_bad(16)` 要 7×10¹⁶ 次调用，实际不可能跑完。好写法每层只把上一行取一次（`n+1` 次调用），总时间约 `O(n²)`（每层拼一行，共 `n` 层）。迭代版和好写法是同一个递推、方向相反（从第 0 行往上推），没有调用栈，实测略快一点。
 
-## 5. 在 GitHub 发起 PR
+---
 
-推送后打开**你的 Fork**，点击 **Compare & pull request**；也可进入教师仓库的 **Pull requests → New pull request → compare across forks**。按 [GitHub 官方说明](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork) 选择：
+## 6. AI 使用说明
 
-| 项目 | 应选内容 |
-| --- | --- |
-| base repository（接收作业） | `seasideGargantua/FIP-212` |
-| base（目标分支） | `main` |
-| head repository（你的作业） | `你的用户名/FIP-212` |
-| compare（你的分支） | `w6-你的用户名` |
-
-PR 标题可用 `W6 作业：你的用户名（组别）`。先看 **Files changed**，确认只包含自己的作业文件，再点击 **Create pull request**。PR 说明可用下面的模板，勾选前务必实际完成：
-
-```markdown
-## 本次作业
-- 提交者 / 组别：
-- 文件目录：W6/homework/我的GitHub用户名/
-- 已完成内容：
-- 未完成内容及原因：
-
-## 验证
-- [ ] 运行并核对了递归版 n=0、1、3、4
-- [ ] 已完成的迭代版通过同样测试；若未完成，已在说明中标注
-- [ ] README 中记录了手工推演、错误与修复、真实测试结果
-- [ ] 速度对比区分了实测、理论推导和未测量
-- [ ] 已如实说明 AI 使用情况
-- [ ] Files changed 只包含自己的作业文件
-
-运行命令：
-实际结果：
-需要老师帮助的问题：
-```
-
-把 **PR 链接**按课堂要求交给教师。PR 创建成功表示“已提交待审阅”；由教师决定是否合并，请不要自行点击 Merge。
-
-## 6. 收到修改意见后怎么办？
-
-在本地**同一个作业分支**修改，重新运行测试，再执行：
-
-```bash
-git add W6/homework/YOUR_GITHUB_USERNAME/pascal.py W6/homework/YOUR_GITHUB_USERNAME/README.md
-git diff --cached --check
-git diff --cached
-git commit -m "W6: address review feedback"
-git push
-```
-
-原 PR 会自动更新，不必为同一份修改重复创建 PR。在 PR 下说明改了什么、如何验证，等待教师再次审阅。
-
-## 常见问题
-
-- **推送提示没有权限**：用 `git remote -v` 检查 `origin` 是否误指向教师仓库；应推送到自己的 Fork，再发 PR。
-- **找不到分支 / 提示没有差异**：确认已经 commit 并 push；再检查 PR 的接收方向和 compare 分支，不能把自己的 `main` 当成作业分支。
-- **只在本地完成了作业**：commit 只保存到本地；push 上传到自己的 Fork；创建 PR 才是向教师仓库提交。
-- **文件放错位置**：应为 `W6/homework/你的GitHub用户名/`；公共 `readme.md` 是本教程，自己的说明文件放在个人目录内。
-- **出现冲突**：先保存工作，查看冲突文件；不确定时把报错和 PR 链接交给教师，不要强推或覆盖他人文件。
+- **是否使用 AI**：使用了。
+- **工具**：DeepSeek Harness（命令行/编辑器里的编码智能体，DeepSeek 模型）。
+- **引用的文件（`@` 等价引用）**：在工作区打开 `W6/homework/lbgs-1/`，对本目录的 `pascal.py` 做等价于 `@pascal.py` 的引用（智能体直接读写该文件），没有把整份代码粘进网页对话框。
+- **AI 帮助的部分**：`pascal.py` 里三种测试/计时脚本的初稿、本 `README.md` 的草稿整理（推演表格、测试表格、速度对比文字的排版）。
+- **本人手写与验证的部分**：`pascal.py` 里的三种方式的实现函数代码
+- **核对方式**：本文件第 3、5 节的所有数值都来自实际运行 `python W6/homework/lbgs-1/pascal.py`（含 `--slow`）与 `pascal_wrong` 的错误复现，未核对的项已标注「未测量」。
