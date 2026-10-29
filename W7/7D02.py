@@ -5,15 +5,15 @@ def quick_sort(arr):
         return arr
     pivot = arr[0]
     less = []
-    equal = [pivot]
+    equal = []
     greater = []
-    for i in range(1, len(arr)):
-        if arr[i] < pivot:
-            less.append(arr[i])
-        elif arr[i] == pivot:
-            equal.append(arr[i])
+    for x in arr:
+        if x < pivot:
+            less.append(x)
+        elif x == pivot:
+            equal.append(x)
         else:
-            greater.append(arr[i])
+            greater.append(x)
     return quick_sort(less) + equal + quick_sort(greater)
 
 if __name__ == '__main__':
