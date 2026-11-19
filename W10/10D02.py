@@ -19,6 +19,7 @@ def best_match(ratings, user_id):
 
 
 if __name__ == '__main__':
+    # 输出用例：用户 1 与用户 4 评分完全相同，相似度最高
     ratings = np.array([[5, 1, 2, 4],
                         [4, 2, 1, 5],
                         [1, 5, 5, 1],
@@ -26,3 +27,4 @@ if __name__ == '__main__':
                         [3, 3, 3, 3]])
     best_id, sim = best_match(ratings, 1)
     print(f"{best_id} {sim:.3f}")
+    # 4 1.000
